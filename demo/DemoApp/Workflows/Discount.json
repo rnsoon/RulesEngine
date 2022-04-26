@@ -1,7 +1,23 @@
 [
   {
     "WorkflowName": "Discount",
+    "GlobalParams": [
+      {
+        "Name": "CountryBlackList",
+        "Expression": "\"austria,india,canada\""
+      }
+    ],
     "Rules": [
+      {
+        "RuleName": "country_length",
+        "RuleExpressionType": "MethodExpression",
+        "Expression": "Validators.MinMaxLength(input1.country, 20, 40)"
+      },
+      {
+        "RuleName": "country_in_blacklist",
+        "RuleExpressionType": "MethodExpression",
+        "Expression": "Validators.NotIn(input1.country, CountryBlackList)"
+      },
       {
         "RuleName": "GiveDiscount10",
         "SuccessEvent": "10",
@@ -40,7 +56,7 @@
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "Operator": "OrElse",
-        "Rules":[
+        "Rules": [
           {
             "RuleName": "IsLoyalAndHasGoodSpend",
             "ErrorMessage": "One or more adjust rules failed.",

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Exceptions;
+using RulesEngine.ExpressionBuilders;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,37 @@ namespace RulesEngine.HelperFunctions
 
             };
             
+        }
+
+        internal static RuleFunc<RuleResultTree> ToResultTree(ReSettings reSettings, Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], MethodExpressionResult> isSuccessFunc, string exceptionMessage = "")
+        {
+            return (inputs) => {
+                MethodExpressionResult result = null;
+
+                var isSuccess = false;
+                var inputsDict = new Dictionary<string, object>();
+                try
+                {
+                    inputsDict = inputs.ToDictionary(c => c.Name, c => c.Value);
+                    result = isSuccessFunc(inputs.Select(c => c.Value).ToArray());
+                    isSuccess = result?.IsSuccess ?? false;
+                }
+                catch (Exception ex)
+                {
+                    exceptionMessage = GetExceptionMessage($"Error while executing Rule : {rule?.RuleName} - {ex.Message}", reSettings);
+                    HandleRuleException(new RuleException(exceptionMessage, ex), rule, reSettings);
+                    isSuccess = false;
+                }
+
+                return new RuleResultTree {
+                    Rule = rule,
+                    Inputs = inputsDict,
+                    IsSuccess = isSuccess,
+                    ChildResults = childRuleResults,
+                    ErrorCoordinates = result?.Coordinates.Select(x=>string.Format(x, rule.RuleName)).ToList(),
+                    ExceptionMessage = exceptionMessage
+                };
+            };
         }
 
         internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSettings reSettings, Rule rule,Exception ex)

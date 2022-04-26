@@ -51,6 +51,11 @@ namespace RulesEngine.Models
         public string ExceptionMessage { get; set; }
 
         /// <summary>
+        /// Gets the exception message in case an error is thrown during rules calculation.
+        /// </summary>
+        public IList<string> ErrorCoordinates { get; set; }
+
+        /// <summary>
         /// Gets or sets the rule evaluated parameters.
         /// </summary>
         /// <value>

@@ -41,7 +41,9 @@ namespace DemoApp
             var fileData = File.ReadAllText(files[0]);
             var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
-            var bre = new RulesEngine.RulesEngine(workflow.ToArray(), null);
+            var reSettingsWithCustomTypes = new ReSettings { CustomTypes = new Type[] { typeof(Validators) } };
+
+            var bre = new RulesEngine.RulesEngine(workflow.ToArray(), reSettingsWithCustomTypes);
 
             string discountOffered = "No discount offered.";
 
